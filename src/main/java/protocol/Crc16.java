@@ -1,7 +1,5 @@
+package protocol;
 
-/**
- * Source <a href="https://introcs.cs.princeton.edu/java/61data/CRC16.java">CRC16</a>
- */
 public class Crc16 {
 
     private static final int[] TABLE = {
@@ -39,20 +37,11 @@ public class Crc16 {
         0x8201, 0x42C0, 0x4380, 0x8341, 0x4100, 0x81C1, 0x8081, 0x4040,
     };
 
-    public static short calculateCrc(String arg) {
-        return calculateCrc(arg.getBytes());
-    }
-
     public static short calculateCrc(byte[] bytes) {
         int crc = 0x0000;
         for (byte b : bytes) {
             crc = (crc >>> 8) ^ TABLE[(crc ^ b) & 0xff];
         }
-
         return (short) crc;
-    }
-
-    public static void printCrc(String arg) {
-        System.out.println(Integer.toHexString(calculateCrc(arg)));
     }
 }
