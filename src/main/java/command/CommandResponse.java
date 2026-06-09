@@ -26,4 +26,8 @@ public class CommandResponse {
     public static CommandResponse error(long packetId, int userId, String reason) {
         return new CommandResponse(packetId, userId, false, reason, 0);
     }
+
+    public static CommandResponse of(long packetId, int userId, boolean success, String message, int intData) {
+        return new CommandResponse(packetId, userId, success, message, intData);
+    }
 }
