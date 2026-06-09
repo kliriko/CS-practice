@@ -2,17 +2,18 @@ package pipeline;
 
 import command.CommandResponse;
 import command.WarehouseCommand;
-import warehouse.Warehouse;
+import warehouse.ProductService;
 
 import java.util.concurrent.BlockingQueue;
 
 public class CommandProcessor implements Processor {
-    private final BlockingQueue<CommandResponse> outputQueue;
-    private final Warehouse warehouse;
 
-    public CommandProcessor(BlockingQueue<CommandResponse> outputQueue, Warehouse warehouse) {
+    private final BlockingQueue<CommandResponse> outputQueue;
+    private final ProductService service;
+
+    public CommandProcessor(BlockingQueue<CommandResponse> outputQueue, ProductService service) {
         this.outputQueue = outputQueue;
-        this.warehouse = warehouse;
+        this.service = service;
     }
 
     @Override
@@ -29,31 +30,31 @@ public class CommandProcessor implements Processor {
         try {
             return switch (cmd.type) {
                 case GET_STOCK -> {
-                    int qty = warehouse.getStock(((WarehouseCommand.GetStock) cmd).productId);
+                    int qty = service.getStock(((WarehouseCommand.GetStock) cmd).productId);
                     yield CommandResponse.ok(cmd.packetId, cmd.userId, qty);
                 }
                 case DEBIT_STOCK -> {
                     WarehouseCommand.DebitStock c = (WarehouseCommand.DebitStock) cmd;
-                    warehouse.debitStock(c.productId, c.quantity);
+                    service.debitStock(c.productId, c.quantity);
                     yield CommandResponse.ok(cmd.packetId, cmd.userId);
                 }
                 case CREDIT_STOCK -> {
                     WarehouseCommand.CreditStock c = (WarehouseCommand.CreditStock) cmd;
-                    warehouse.creditStock(c.productId, c.quantity);
+                    service.creditStock(c.productId, c.quantity);
                     yield CommandResponse.ok(cmd.packetId, cmd.userId);
                 }
                 case ADD_GROUP -> {
-                    int id = warehouse.addGroup(((WarehouseCommand.AddGroup) cmd).groupName);
+                    int id = service.addGroup(((WarehouseCommand.AddGroup) cmd).groupName);
                     yield CommandResponse.ok(cmd.packetId, cmd.userId, id);
                 }
                 case ADD_PRODUCT -> {
                     WarehouseCommand.AddProduct c = (WarehouseCommand.AddProduct) cmd;
-                    int id = warehouse.addProduct(c.groupId, c.productName);
+                    int id = service.create(c.groupId, c.productName).id;
                     yield CommandResponse.ok(cmd.packetId, cmd.userId, id);
                 }
                 case SET_PRICE -> {
                     WarehouseCommand.SetPrice c = (WarehouseCommand.SetPrice) cmd;
-                    warehouse.setPrice(c.productId, c.price);
+                    service.setPrice(c.productId, c.price);
                     yield CommandResponse.ok(cmd.packetId, cmd.userId);
                 }
             };

@@ -2,6 +2,7 @@ package pipeline;
 
 import command.CommandResponse;
 import command.WarehouseCommand;
+import warehouse.ProductService;
 import warehouse.Warehouse;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -57,7 +58,7 @@ public class WarehousePipeline {
         this.warehouse  = new Warehouse();
         this.receiver   = receiver;
         this.decriptor  = new MessageDecriptor(commandQueue);
-        this.processor  = new CommandProcessor(responseQueue, warehouse);
+        this.processor  = new CommandProcessor(responseQueue, new ProductService(warehouse));
         this.encriptor  = new ResponseEncriptor();
         this.sender     = sender;
     }

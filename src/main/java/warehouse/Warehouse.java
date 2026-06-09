@@ -1,5 +1,7 @@
 package warehouse;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -46,6 +48,27 @@ public class Warehouse {
 
     public double getPrice(int productId) {
         return product(productId).price;
+    }
+
+    public Product getProduct(int id) {
+        return product(id);
+    }
+
+    public void removeProduct(int id) {
+        Product p = products.remove(id);
+        if (p == null) throw new IllegalArgumentException("Product not found: " + id);
+        ProductGroup g = groups.get(p.groupId);
+        if (g != null) g.productIds.remove(Integer.valueOf(id));
+    }
+
+    public List<Product> getAllProducts() {
+        return new ArrayList<>(products.values());
+    }
+
+    public ProductGroup getGroup(int id) {
+        ProductGroup g = groups.get(id);
+        if (g == null) throw new IllegalArgumentException("Group not found: " + id);
+        return g;
     }
 
     private Product product(int id) {
